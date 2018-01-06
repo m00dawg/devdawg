@@ -65,8 +65,8 @@ A dev cycle is a sequence of development steps to go through such as Development
 Blix, Wash, etc. The controller will track the remaining time while also keeping
 the water bath at the desired temperature.
 
-A scaffold is built to manage rotation speed and direction for a rotary processor,
-but it's all totally untested right now. I have a motor and an h-bridge in the mail
-to at least test motor function but building the rig will take some time and design
-work.
-
+A partial implemetnation of routines to manage rotation speed and direction 
+has been implemented, but is untested. I have a motor and H-bridge in the
+mail to test at least the motor functionality, but building the rig will
+take some time and design work. The code is pretty easy - the physical 
+design work, not so much.
