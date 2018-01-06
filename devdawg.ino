@@ -68,6 +68,7 @@ const byte heater = 4;
 const byte motorSpeed = 5;
 const byte motorForward = 6;
 const byte motorReverse = 7;
+const byte recircPump = 8;
 
 /************
  * Variables 
@@ -158,12 +159,14 @@ void setup()
   pinMode(motorSpeed, OUTPUT);
   pinMode(motorForward, OUTPUT);
   pinMode(motorReverse, OUTPUT);
+  pinMode(recircPump, OUTPUT);
   
   digitalWrite(buzzer, LOW);
   digitalWrite(heater, LOW);
   analogWrite(motorSpeed, 0);
   digitalWrite(motorForward, LOW);
   digitalWrite(motorReverse, LOW);
+  digitalWrite(recircPump, LOW);
   
   Serial.begin(9600); 
   lcd.begin(LCD_COLUMNS, LCD_ROWS);

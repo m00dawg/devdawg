@@ -38,6 +38,7 @@ Uno:
   * Buzzer: D3
   * Heater Relay: D4
   * Motor: D5 (PWM), D6, D7
+  * Recirc Pump Relay: D8
 
 Needed Parts
 ------------
@@ -94,6 +95,7 @@ Near-Term:
 
   * Find a heater element, test/tune PID
   * Finish Motor/Rotation Routine
+  * Optional controlling of recirc pump
   * Add a buzzer (for warnings and when dev steps finish)
 
 Future Work:
