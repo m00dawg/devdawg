@@ -1,17 +1,17 @@
 /* DevDawg
  *  
- *  Open Source Arduino-Based Rotary Film Development Controller 
+ * Open Source Arduino-Based Rotary Film Development Controller.
+ * by Tim Soderstrom
  *  
+ *  Licensed under the GPLv3 (see LICENSE for more information)
  */
 
-#include <PID_v1.h>
-#include <Wire.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
-#include <Adafruit_RGBLCDShield.h>
-//#include "structs.h"
+/**********
+ * Defines 
+ **********/
+#define VERSION "v0.02"
+#define BANNER_DELAY_MS 1000
 
-// Defines
 #define RED 0x1
 #define YELLOW 0x3
 #define GREEN 0x2
@@ -31,6 +31,7 @@
 #define ON 1
 #define OFF 0
 
+// Menu Options
 #define MAIN_MENU 0
 #define PREHEAT 1
 #define DEVELOP_FILM 2
@@ -41,23 +42,36 @@
 #define MAX_DEV_STEPS 8
 // How often to check the temperature probe
 #define TEMP_UPDATE_INTERVAL 10
-// Default Preheat Temperature
+// Default Preheat Temperature (C)
 #define DEFAULT_PREHEAT_TEMP 39
 // PID Parameters
 #define KP 2
 #define KI 5
 #define KD 1
 
+/***********
+ * Includes 
+ ***********/
+#include <PID_v1.h>
+#include <Wire.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <Adafruit_RGBLCDShield.h>
 #include "structs.h"
 
-// Pins
-const int motorForward = A1;
-const int motorReverse = A2;
-const int temperatureProbes = 2;
-const int heater = 3;
-const int buzzer = 4;
+/*******
+ * Pins
+ *******/
+const byte temperatureProbes = 2;
+const byte buzzer = 3;
+const byte heater = 4;
+const byte motorSpeed = 5;
+const byte motorForward = 6;
+const byte motorReverse = 7;
 
-// Simple Variables
+/************
+ * Variables 
+ ************/
 byte pickedProcess = 0;
 byte button = 0;
 byte mode = 0;
@@ -67,7 +81,9 @@ unsigned long pidWindowStartTime;
 unsigned int pidWindowSizeMS = 5000;
 bool heaterState = OFF;
 
-// Objects
+/**********
+ * Objects 
+ **********/
 Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
@@ -78,7 +94,9 @@ DeviceAddress thermometer;
 // PID Object
 PID pid(&pidInput, &pidOutput, &pidSetpoint, KP, KI, KD, DIRECT);
 
-// Structs
+/******************************
+ * Development Process Structs 
+ ******************************/
 
 // Dev Processes (These can eventually be in the EEPROM)
 const byte processCount = 3;
@@ -129,18 +147,34 @@ const DevProcess process[] =
 
 DevProcess currentProcess;
 
-void setup() {
+/*******
+ * Code 
+ ********/
+
+void setup()
+{
+  pinMode(buzzer, OUTPUT);
+  pinMode(heater, OUTPUT);
+  pinMode(motorSpeed, OUTPUT);
+  pinMode(motorForward, OUTPUT);
+  pinMode(motorReverse, OUTPUT);
+  
+  digitalWrite(buzzer, LOW);
+  digitalWrite(heater, LOW);
+  analogWrite(motorSpeed, 0);
+  digitalWrite(motorForward, LOW);
+  digitalWrite(motorReverse, LOW);
+  
   Serial.begin(9600); 
   lcd.begin(LCD_COLUMNS, LCD_ROWS);
-
 
   /* Print Title and Version */
   lcd.setBacklight(YELLOW);
   lcd.setCursor(0,0);
   lcd.print("DevDawg");
   lcd.setCursor(0,1);
-  lcd.print("v0.01");
-  delay(500);
+  lcd.print(VERSION);
+  delay(BANNER_DELAY_MS);
 
   pidWindowStartTime = millis();
 
