@@ -1,0 +1,6 @@
+TODO
+----
+
+* Motor/Rotation Routine
+* Implement, you know, actual sensors
+* PID implementation for temp control
