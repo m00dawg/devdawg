@@ -90,6 +90,16 @@ Code is licensed Under the GPLv3. Please see LICENSE for more information.
 TODO
 ----
 
+Near-Term:
+
   * Find a heater element, test/tune PID
   * Finish Motor/Rotation Routine
   * Add a buzzer (for warnings and when dev steps finish)
+
+Future Work:
+
+  * Purpose built all in one controller board
+  * Better heating solution
+  * Fancy controller enclosure
+  * Fancy chemcial bath, rotary solution
+  * Somehow a means to automatically cool the water for BW?
