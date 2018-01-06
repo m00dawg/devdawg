@@ -5,7 +5,7 @@
  */
 
 #include <Adafruit_RGBLCDShield.h>
-#include "devtimes.h"
+#include "structs.h"
 
 // Defines
 #define RED 0x1
