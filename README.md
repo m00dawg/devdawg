@@ -28,6 +28,17 @@ Used Libraries
   * DB18S20 Temperature Control (https://github.com/milesburton/Arduino-Temperature-Control-Library)
   * Arduino PID Library (https://github.com/br3ttb/Arduino-PID-Library/)
 
+Pin Map
+-------
+
+Uno:
+
+  * I2C: A4, A5
+  * DB18S20 Temperature Probe: D2
+  * Buzzer: D3
+  * Heater Relay: D4
+  * Motor: D5 (PWM), D6, D7
+
 Needed Parts
 ------------
 
@@ -70,3 +81,15 @@ has been implemented, but is untested. I have a motor and H-bridge in the
 mail to test at least the motor functionality, but building the rig will
 take some time and design work. The code is pretty easy - the physical 
 design work, not so much.
+
+License
+-------
+
+Code is licensed Under the GPLv3. Please see LICENSE for more information.
+
+TODO
+----
+
+  * Find a heater element, test/tune PID
+  * Finish Motor/Rotation Routine
+  * Add a buzzer (for warnings and when dev steps finish)
