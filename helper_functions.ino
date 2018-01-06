@@ -1,21 +1,39 @@
 void updateDisplay(int totalSeconds, int temperature)
 {
-  char buffer[16];
-  sprintf(buffer, "%02d:%02d  Temp: %dC", totalSeconds / 60, totalSeconds % 60, temperature);
+  char buffer[32];
+  sprintf(buffer, "%02d:%02d  Temp: %02dC", int(totalSeconds / 60), int(totalSeconds % 60), temperature);
   lcd.setCursor(0,1);
   lcd.print(buffer);
 }
 
+
+
 byte wait(char line1[16], char line2[16])
 {
   byte button=0;
+  drawDisplay(line1, line2);
+  while(!button)
+    button = lcd.readButtons();
+  lcd.clear();
+  delay(250);
+  return button;
+}
+
+void drawDisplay(char line1[16], char line2[16])
+{
   lcd.clear();
   lcd.print(line1);
   lcd.setCursor(0,1);
   lcd.print(line2);
-  while(!button)
-    button = lcd.readButtons();
-  lcd.clear();
-  return button;
+}
+
+int collectTemperatures()
+{
+  sensors.requestTemperatures();
+  if(sensors.getAddress(thermometer, 0))
+  {
+    return sensors.getTempC(thermometer);
+  }
+  return -255;
 }
 
