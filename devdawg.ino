@@ -9,7 +9,7 @@
 /**********
  * Defines 
  **********/
-#define VERSION "v0.02"
+#define VERSION "v0.03"
 #define BANNER_DELAY_MS 1000
 
 #define RED 0x1
@@ -110,7 +110,7 @@ const DevProcess process[] =
   {
     "Test",
     255,
-    0,
+    10,
     24,
     5,    
     {
@@ -182,20 +182,16 @@ void setup()
   lcd.print(VERSION);
   delay(BANNER_DELAY_MS);
 
+  /* Setup PID */
   pidWindowStartTime = millis();
-
-  //initialize the variables we're linked to
   pidSetpoint = 100;
-
-  //tell the PID to range between 0 and the full window size
   pid.SetOutputLimits(0, pidWindowSizeMS);
-
-  //turn the PID on
   pid.SetMode(AUTOMATIC);
 }
 
 void loop()
 {
+  /* Menu Functions */
   switch(mode)
   {
     case PREHEAT:
