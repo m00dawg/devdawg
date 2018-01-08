@@ -1,5 +1,5 @@
-DevDawg by Tim Soderstrom
-=========================
+DevDawg
+=======
 
 Open source Arduino-based microcontroller for DIY film development projects.
 
