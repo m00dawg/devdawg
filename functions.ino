@@ -75,21 +75,7 @@ void processStep(DevStep step, byte motorSpeed, byte motorDirectionInterval, int
       }
       else
         ++tempUpdateCycle;
-
-      // Reverse direction of rotation every specified seconds
-      if(motorUpdateCycle > motorDirectionInterval - 1)
-      {
-        if(motorDirection == FORWARD)
-          motorDirection = REVERSE;
-        else
-          motorDirection = FORWARD;
-        motorUpdateCycle = 0;
-        Serial.print("Motor Direction: ");
-        Serial.println(motorDirection);
-      }
-      else
-        ++motorUpdateCycle;
-
+      controlMotor(motorSpeed, motorDirectionInterval);
       updateDisplay(int(timeRemainingMS / SECONDS_MS), currentTemperature);
       timeRemainingMS -= SECONDS_MS;
       previousMillis = millis();
@@ -103,6 +89,7 @@ void developFilm()
   pickedProcess = pickProcess();
   currentProcess = process[pickedProcess];
   wait(currentProcess.name, "Press Any Key");
+  controlMotor(0, 0);
   // After picking a process, pre-heat then start dev
   preheat(currentProcess.targetTemperature);
   for(byte i = 0 ; i < currentProcess.steps; ++i)
@@ -111,6 +98,8 @@ void developFilm()
       currentProcess.motorSpeed, 
       currentProcess.motorDirectionInterval, 
       currentProcess.targetTemperature);
+    Serial.println("Motor: Stopping");
+    controlMotor(0, 0);
     Serial.println("done");
     wait(currentProcess.devStep[i].name, "Complete");
   }
@@ -182,5 +171,46 @@ void controlTemp()
     }
     digitalWrite(heater, LOW);
   }
+}
+
+void controlMotor(byte speed, byte directionInterval)
+{
+  analogWrite(motorSpeed, speed);  
+
+  if(directionInterval > 0)
+  {
+    if(millis() - previousMotorMillis >= SECONDS_MS * directionInterval)
+    {
+      if(motorDirection == FORWARD)
+      {
+        Serial.println("Motor: Reverse");
+        digitalWrite(motorX, LOW);
+        digitalWrite(motorY, HIGH);
+        motorDirection = REVERSE;
+      }
+      else
+      {
+        Serial.println("Motor: Forward");
+        digitalWrite(motorX, HIGH);
+        digitalWrite(motorY, LOW);
+        motorDirection = FORWARD;
+      }
+      previousMotorMillis = millis();
+    }
+  }
+  /* If directionInterval is zero, never change speed */
+  else
+  {
+    digitalWrite(motorX, HIGH);
+    digitalWrite(motorY, LOW);
+    motorDirection = FORWARD;
+  }
+}
+
+void testMotor()
+{
+  drawDisplay("Testing", "Motor");
+  while(true)
+    controlMotor(255, 10);
 }
 

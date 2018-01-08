@@ -70,18 +70,19 @@ with a relay. The PID library can handle both relays and PWM options but for a
 decent amount of water, a simple relay may be enough (still need to test).
 
 Otherwise currently the basic UI is implemented allowing one to select various
-modes and development processes. It has routines to pre-heat the water bath and
-run through a development cycle.
+modes and development processes and a proof of concept of handing tank rotation
+has been tested using a motor and an H-bridge driver. There are also routines 
+to pre-heat the water bath and run through a full development cycle.
 
 A dev cycle is a sequence of development steps to go through such as Development,
 Blix, Wash, etc. The controller will track the remaining time while also keeping
-the water bath at the desired temperature.
+the water bath at the desired temperature and managing tank rotation.
 
-A partial implemetnation of routines to manage rotation speed and direction 
-has been implemented, but is untested. I have a motor and H-bridge in the
-mail to test at least the motor functionality, but building the rig will
-take some time and design work. The code is pretty easy - the physical 
-design work, not so much.
+The motor rotation stuff works - it will rotate at a provided speed and optionally
+change direction at specific intervals. This is implemented using an H-bridge and
+a 12V DC motor. Building the rig to actually turn the tank take some design work
+and has yet to be done. The code is pretty easy - the physical design work, 
+not so much.
 
 License
 -------

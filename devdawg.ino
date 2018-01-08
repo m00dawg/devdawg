@@ -33,9 +33,10 @@
 
 // Menu Options
 #define MAIN_MENU 0
-#define PREHEAT 1
-#define DEVELOP_FILM 2
-#define MAX_OPTION 2
+#define DEVELOP_FILM 1
+#define PREHEAT 2
+#define TEST_MOTOR 3
+#define MAX_OPTION 3
 
 // Tunable Defines
 // Maximum number of dev steps a particular Dev Process can have.
@@ -66,8 +67,8 @@ const byte temperatureProbes = 2;
 const byte buzzer = 3;
 const byte heater = 4;
 const byte motorSpeed = 5;
-const byte motorForward = 6;
-const byte motorReverse = 7;
+const byte motorX = 6;
+const byte motorY = 7;
 const byte recircPump = 8;
 
 /************
@@ -81,6 +82,8 @@ double pidInput, pidOutput, pidSetpoint;
 unsigned long pidWindowStartTime;
 unsigned int pidWindowSizeMS = 5000;
 bool heaterState = OFF;
+unsigned long previousMotorMillis = 0;
+bool motorDirection = FORWARD;
 
 /**********
  * Objects 
@@ -106,21 +109,21 @@ const DevProcess process[] =
 {
   {
     "Test",
-    127,
-    2,
+    255,
+    0,
     24,
     5,    
     {
-      {"Develop", 5, RED},
-      {"Blix", 10, VIOLET},
-      {"Wash 1", 20, BLUE},
-      {"Wash 2", 30, TEAL},
+      {"Develop", 30, RED},
+      {"Blix", 35, VIOLET},
+      {"Wash 1", 36, BLUE},
+      {"Wash 2", 37, TEAL},
       {"Stabilizer", 40, WHITE}
     }
   },
   {
     "C41",
-    127,
+    255,
     10,
     38,
     5,
@@ -134,7 +137,7 @@ const DevProcess process[] =
   },
   {
     "Dlta100 DDX 1+4",
-    127,
+    255,
     10,
     20,
     3,
@@ -157,15 +160,15 @@ void setup()
   pinMode(buzzer, OUTPUT);
   pinMode(heater, OUTPUT);
   pinMode(motorSpeed, OUTPUT);
-  pinMode(motorForward, OUTPUT);
-  pinMode(motorReverse, OUTPUT);
+  pinMode(motorX, OUTPUT);
+  pinMode(motorY, OUTPUT);
   pinMode(recircPump, OUTPUT);
   
   digitalWrite(buzzer, LOW);
   digitalWrite(heater, LOW);
   analogWrite(motorSpeed, 0);
-  digitalWrite(motorForward, LOW);
-  digitalWrite(motorReverse, LOW);
+  digitalWrite(motorX, LOW);
+  digitalWrite(motorY, LOW);
   digitalWrite(recircPump, LOW);
   
   Serial.begin(9600); 
@@ -207,19 +210,30 @@ void loop()
       mode = 0;
       break;
     }
+    case TEST_MOTOR:
+    {
+      testMotor();
+      mode = 0;
+      break;
+    }
     // Main Menu
     default:
     {
       switch(option)
       {
+        case DEVELOP_FILM:
+        {
+          button = wait("Select Mode", "Develop Film");
+          break;
+        }
         case PREHEAT:
         {
           button = wait("Select Mode", "Preheat");
           break;
         }
-        case DEVELOP_FILM:
+        case TEST_MOTOR:
         {
-          button = wait("Select Mode", "Develop Film");
+          button = wait("Select Mode", "Test Motor");
           break;
         }
         default:
