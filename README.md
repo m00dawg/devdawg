@@ -39,6 +39,7 @@ Uno:
   * Heater Relay: D4
   * Motor: D5 (PWM), D6, D7
   * Recirc Pump Relay: D8
+  * SPI: D10-D13 (Maybe, for SD Card functinos)
 
 Needed Parts
 ------------

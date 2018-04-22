@@ -27,13 +27,20 @@ void drawDisplay(char line1[16], char line2[16])
   lcd.print(line2);
 }
 
-int collectTemperatures()
+double collectTemperatures()
 {
   sensors.requestTemperatures();
   if(sensors.getAddress(thermometer, 0))
   {
-    return sensors.getTempC(thermometer);
+    return double(sensors.getTempC(thermometer));
   }
   return -255;
+}
+
+void testMotor()
+{
+  drawDisplay("Testing", "Motor");
+  while(true)
+    controlMotor(255, 10);
 }
 

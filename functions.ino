@@ -67,7 +67,6 @@ void processStep(DevStep step, byte motorSpeed, byte motorDirectionInterval, int
       // Every 10 seconds, check temperature
       if(tempUpdateCycle > TEMP_UPDATE_INTERVAL - 1)
       {
-        // Placeholder until a real temp sensor is in place
         currentTemperature = collectTemperatures();
         tempUpdateCycle = 0;
         Serial.print("Temperature: ");
@@ -91,7 +90,8 @@ void developFilm()
   wait(currentProcess.name, "Press Any Key");
   controlMotor(0, 0);
   // After picking a process, pre-heat then start dev
-  preheat(currentProcess.targetTemperature);
+  targetTemperature = currentProcess.targetTemperature;
+  preheat();
   for(byte i = 0 ; i < currentProcess.steps; ++i)
   {
     processStep(currentProcess.devStep[i], 
@@ -107,13 +107,13 @@ void developFilm()
   wait("Dev Cycle", "Complete");
 }
 
-void preheat(int desiredTemperature)
+void preheat()
 {
   unsigned long previousMillis = 0;
   byte button = 0;
-  int targetTemperature = desiredTemperature;
-  int currentTemperature = 0;
   char buffer[17];
+  char currentTempChar[6];
+  char targetTempChar[6];
   
   while(true)
   {
@@ -125,6 +125,11 @@ void preheat(int desiredTemperature)
       Serial.println(currentTemperature);
       Serial.print("Target Temperature: ");
       Serial.println(targetTemperature);
+      Serial.print("PID Output: ");
+      Serial.println(pidOutput);
+      /* Removing for now since for mixing chemicals we want it to still adjust
+       *  temperatures (since heating the chemicals would bring the water
+       *  temperature down over time).
       if(currentTemperature == targetTemperature)
       {
         wait("Target", "Reached");
@@ -132,18 +137,21 @@ void preheat(int desiredTemperature)
       }
       else
       {
-        sprintf(buffer, "%02dC / %02dC", currentTemperature, targetTemperature);
-        drawDisplay("Preheating", buffer);
-      }
+      */
+      dtostrf(currentTemperature, 5, 2, currentTempChar);
+      dtostrf(targetTemperature, 5, 2, targetTempChar);
+      sprintf(buffer, "%sC / %sC", currentTempChar, targetTempChar);
+      //sprintf(buffer, "%02dC / %02dC", currentTemperature, targetTemperature);
+      drawDisplay("Preheating", buffer);
       previousMillis = millis();
     }
     button = lcd.readButtons();
     if(button & BUTTON_LEFT)
       return;
     if(button & BUTTON_UP)
-      targetTemperature += 1;
+      targetTemperature += TEMP_ADJUSTMENT_PRECISION;
     if(button & BUTTON_DOWN)
-    targetTemperature -= 1;
+    targetTemperature -= TEMP_ADJUSTMENT_PRECISION;
   }
 }
 
@@ -207,10 +215,5 @@ void controlMotor(byte speed, byte directionInterval)
   }
 }
 
-void testMotor()
-{
-  drawDisplay("Testing", "Motor");
-  while(true)
-    controlMotor(255, 10);
-}
+
 

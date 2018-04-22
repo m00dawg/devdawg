@@ -1,4 +1,4 @@
-/* DevDawg
+ /* DevDawg
  *  
  * Open Source Arduino-Based Rotary Film Development Controller.
  * by Tim Soderstrom
@@ -9,7 +9,7 @@
 /**********
  * Defines 
  **********/
-#define VERSION "v0.03"
+#define VERSION "v0.04"
 #define BANNER_DELAY_MS 1000
 
 #define RED 0x1
@@ -45,14 +45,25 @@
 #define TEMP_UPDATE_INTERVAL 10
 // Default Preheat Temperature (C)
 #define DEFAULT_PREHEAT_TEMP 39
+// Manual Temperature Adjustment Steps
+#define TEMP_ADJUSTMENT_PRECISION 0.5
 // PID Parameters
-#define KP 2
+//#define KP 2
+//#define KI 5
+//#define KD 1
+#define KP 4
 #define KI 5
-#define KD 1
+#define KD 2
+
 
 /***********
  * Includes 
  ***********/
+// Maybe for the future for storing and easily transferring development processes
+// Might be simpler to use I2C and an EEPROM but then there needs to be a mechanicsm
+// to add/remove development options
+// #include <SPI.h>
+// #include <SD.h>
 #include <PID_v1.h>
 #include <Wire.h>
 #include <OneWire.h>
@@ -78,9 +89,11 @@ byte pickedProcess = 0;
 byte button = 0;
 byte mode = 0;
 byte option = 0;
-double pidInput, pidOutput, pidSetpoint;
+double pidOutput;
+double currentTemperature = 0;
+double targetTemperature = DEFAULT_PREHEAT_TEMP;
 unsigned long pidWindowStartTime;
-unsigned int pidWindowSizeMS = 5000;
+unsigned int pidWindowSizeMS = 10000;
 bool heaterState = OFF;
 unsigned long previousMotorMillis = 0;
 bool motorDirection = FORWARD;
@@ -96,7 +109,7 @@ DallasTemperature sensors(&oneWire);
 DeviceAddress thermometer;
 
 // PID Object
-PID pid(&pidInput, &pidOutput, &pidSetpoint, KP, KI, KD, DIRECT);
+PID pid(&currentTemperature, &pidOutput, &targetTemperature, KP, KI, KD, DIRECT);
 
 /******************************
  * Development Process Structs 
@@ -177,16 +190,17 @@ void setup()
   /* Print Title and Version */
   lcd.setBacklight(YELLOW);
   lcd.setCursor(0,0);
-  lcd.print("DevDawg");
+  lcd.print(F("DevDawg"));
   lcd.setCursor(0,1);
   lcd.print(VERSION);
   delay(BANNER_DELAY_MS);
 
   /* Setup PID */
   pidWindowStartTime = millis();
-  pidSetpoint = 100;
   pid.SetOutputLimits(0, pidWindowSizeMS);
   pid.SetMode(AUTOMATIC);
+
+  currentTemperature = collectTemperatures();
 }
 
 void loop()
@@ -196,7 +210,7 @@ void loop()
   {
     case PREHEAT:
     {
-      preheat(DEFAULT_PREHEAT_TEMP);
+      preheat();
       mode = 0;
       break;
     }
@@ -246,8 +260,8 @@ void loop()
           ++option;
           if(option > 2)
             option = 0;
-          Serial.println("Button Up");
-          Serial.print("Option: ");
+          Serial.println(F("Button Up"));
+          Serial.print(F("Option: "));
           Serial.println(option);
           break;
         }
@@ -256,14 +270,14 @@ void loop()
           --option;
           if(option > 2)
             option = MAX_OPTION;
-          Serial.println("Button Down");
-          Serial.print("Option: ");
+          Serial.println(F("Button Down"));
+          Serial.print(F("Option: "));
           Serial.println(option);
           break;
         }
         case BUTTON_SELECT:
         {
-          Serial.println("Button Select");
+          Serial.println(F("Button Select"));
           mode = option;
           option = 0;
           break;
