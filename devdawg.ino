@@ -35,7 +35,7 @@
 #define MAIN_MENU 0
 #define DEVELOP_FILM 1
 #define PREHEAT 2
-#define TEST_MOTOR 3
+#define RUN_MOTOR 3
 #define MAX_OPTION 3
 
 // Tunable Defines
@@ -47,6 +47,11 @@
 #define DEFAULT_PREHEAT_TEMP 39
 // Manual Temperature Adjustment Steps
 #define TEMP_ADJUSTMENT_PRECISION 0.5
+// Specified Motor RPM
+#define MOTOR_RPM 45
+// Slowet Motor Will Turn
+#define MOTOR_MIN_RPM 24
+
 // PID Parameters
 //#define KP 2
 //#define KI 5
@@ -220,9 +225,9 @@ void loop()
       mode = 0;
       break;
     }
-    case TEST_MOTOR:
+    case RUN_MOTOR:
     {
-      testMotor();
+      runMotor();
       mode = 0;
       break;
     }
@@ -241,9 +246,9 @@ void loop()
           button = wait("Select Mode", "Preheat");
           break;
         }
-        case TEST_MOTOR:
+        case RUN_MOTOR:
         {
-          button = wait("Select Mode", "Test Motor");
+          button = wait("Select Mode", "Turn Rotary");
           break;
         }
         default:
